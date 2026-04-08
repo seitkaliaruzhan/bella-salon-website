@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Bella Beauty</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header class="header">
+  <div class="logo"> Bella Beauty</div>
+  <div class="nav-right"> 
+  <nav>
+    <ul class="menu">
+      <li><a href="index.html" class="active">Home</a></li>
+      <li><a href="services.html">Services</a></li>
+      <li><a href="masters.html">Our masters</a></li>
+      <li><a href="shop.html" class="active">Catalog</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </nav>
+  </div>
+  <div class="auth-links">
+    <a href="auth.html" class="login-link">👤 Login</a>
+    <a href="auth.html" class="signup-link">Sign up</a>
+  </div>
+</div>
+</header>
+
+<div class="home-bf-ribbon" id="home-bf-banner">
+<div class="ribbon-content">
+<span class="ribbon-tag">BLACK FRIDAY</span>
+<p>Don't miss out! <strong>20% OFF</strong> on all beauty services</p>
+<a href="shop.html" class="ribbon-btn">View Offers →</a>
+</div>
+</div>
+
+
+<main class="hero">
+  <div class="hero-text">
+    <h1>Your Beauty, Our Passion</h1>
+
+    <p>
+      Experience luxury beauty services in a serene and elegant environment.  
+      Our expert team is dedicated to making you look and feel your absolute best.
+    </p>
+
+    <div class="buttons">
+     <a href="shop.html" class="btn-primary">Book Now</a>
+     <a href="services.html" class="btn-outline">View Services</a>
+</div>
+
+  </div>
+
+  <div class="hero-image">
+    <img src="beauty.jpeg" alt="Beauty salon">
+  </div>
+
+</main>
+
+<main>
+  
+  <section class="services" id="services">
+    <h2>Our Services</h2>
+    <div class="cards services-cards">
+      
+      <!-- 1 -->
+      <div class="card">
+        <img src="hair.jpg.jpeg">
+        <h3>Hair Styling</h3>
+        <p>Modern haircut and professional styling.</p>
+        <a href="shop.html" class="card-btn">Book now</a>
+        <div class="service-card">
+      </div>
+      </div>
+      <!-- 2 -->
+      <div class="card">
+        <img src="manic.jpg.jpeg">        
+        <h3>Manicure</h3>
+        <p>Classic and gel manicure services.</p>
+        <a href="shop.html" class="card-btn">Book now</a>
+      </div>
+      <!-- 3 -->
+      <div class="card">
+        <img src="makeup.jpg.jpeg">
+        <h3>Makeup</h3>
+        <p>Evening and special occasion makeup.</p>
+        <a href="shop.html" class="card-btn">Book now</a>
+      </div>
+      <!-- 4 -->
+      <div class="card">
+        <img src="lashes1.jpeg" alt="Lash Lamination">
+        <h3>Lash Lamination</h3>
+        <p>Natural looking curled and lifted lashes without extensions.</p>
+        <a href="shop.html" class="card-btn">Book now</a>
+       </div>
+
+      <!-- 5 -->
+      <div class="card">
+        <img src="skin.jpg.jpeg">
+        <h3>Skincare</h3>
+        <p>Facial treatments for healthy skin.</p>
+        <a href="shop.html" class="card-btn">Book now</a>
+      </div>
+      
+     <!-- 6 -->
+      <div class="card">
+       <img src="brows7.jpeg" alt="Eyebrow architecture">
+       <h3>Eyebrow architecture</h3>
+       <p>Perfect eyebrow shape design based on your face features.</p>
+       <a href="shop.html" class="card-btn">Book now</a>
+  </div>
+    </div>
+  </section>
+
+<section class="contact">
+
+  <div class="contact-wrapper">
+
+    
+    <div class="contact-info">
+
+      <h3>Our Contacts</h3>
+
+      <p>📍 Address: Almaty, Kapparov street 12</p>
+      <p>📞 Phone: +7 707 123 45 67</p>
+      <p>✉ Email: bella@beauty.kz</p>
+
+      <h3>Working Hours</h3>
+      <p>Mon–Fri: 09:00 – 20:00</p>
+      <p>Sat-Sun: 10:00 – 22.00</p>
+
+    </div>
+
+    </div>
+
+  </div>
+
+</section>
+</main>
+
+<footer>
+  <p>© 2026 Beauty Salon</p>
+</footer>
+
+</body>
+<script>
+const BF_END_DATE = new Date("2026-03-03T00:00:00");
+const promoBanner = document.getElementById('home-bf-banner');
+if (new Date() > BF_END_DATE) {
+if (promoBanner) promoBanner.style.display = 'none';
+}
+</script>
+</html>
+

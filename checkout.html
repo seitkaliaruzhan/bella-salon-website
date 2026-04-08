@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Checkout | Bella Beauty</title>
+
+  <link rel="stylesheet" href="style.css" />
+  <link rel="stylesheet" href="checkout.css" />
+</head>
+<body>
+
+<header class="header">
+  <div class="logo">Bella Beauty</div>
+
+  <nav>
+    <ul class="menu">
+      <li><a href="index.html">Home</a></li>
+      <li><a href="shop.html">Catalog</a></li>
+      <li><a href="contact.html">Contact</a></li>
+    </ul>
+  </nav>
+</header>
+
+<main class="checkout-page">
+  <section class="checkout-card">
+    <h1>Checkout</h1>
+    <p class="sub">Fill in your details to confirm the order.</p>
+
+    <form id="checkoutForm" novalidate>
+
+      <div class="field">
+        <label>Full name</label>
+        <input type="text" id="fullName" placeholder="Aruzhan Seitkali" />
+        <small class="error" id="errName"></small>
+      </div>
+
+      <div class="field">
+        <label>Email</label>
+        <input type="email" id="email" placeholder="aruzhan@gmail.com" />
+        <small class="error" id="errEmail"></small>
+      </div>
+
+      <div class="field">
+        <label>Phone number</label>
+        <input type="tel" id="phone" placeholder="+7 707 123 45 67" />
+        <small class="error" id="errPhone"></small>
+      </div>
+
+      <div class="field">
+        <label>Delivery address</label>
+        <input type="text" id="address" placeholder="Almaty, Kapparova street 12" />
+        <small class="error" id="errAddress"></small>
+      </div>
+
+      <div class="field">
+        <label>Payment method</label>
+        <select id="payment">
+          <option value="">Choose payment</option>
+          <option value="cash">Cash</option>
+          <option value="card">Card</option>
+        </select>
+        <small class="error" id="errPayment"></small>
+      </div>
+
+      <button type="submit" class="confirm-btn">
+  Confirm Order 
+</button>
+
+      <p class="success" id="successMsg"></p>
+    </form>
+  </section>
+</main>
+
+<footer class="footer">
+  <p>© 2026 Bella Beauty</p>
+</footer>
+
+<script src="checkout.js"></script>
+</body>
+</html>
