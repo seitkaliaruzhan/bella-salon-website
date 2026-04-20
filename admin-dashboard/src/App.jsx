@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
 import Sidebar from './components/Sidebar';
 import Navbar from './components/Navbar';
 import Dashboard from './pages/Dashboard';
@@ -14,9 +14,13 @@ function App() {
           <Navbar />
           <div style={{ padding: '30px' }}>
             <Routes>
+              {/* Сразу открываем Dashboard при запуске */}
               <Route path="/" element={<Dashboard />} />
+              <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/products" element={<Products />} />
               <Route path="/employees" element={<Employees />} />
+              {/* Если забрели не туда — возвращаем на Dashboard */}
+              <Route path="*" element={<Navigate to="/" />} />
             </Routes>
           </div>
         </div> 

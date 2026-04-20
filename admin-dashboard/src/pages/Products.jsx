@@ -1,6 +1,42 @@
-import { useState } from 'react';
+import { useState, useMemo } from 'react'; // 1. Добавили useMemo для оптимизации
 import Modal from '../components/Modal';
 
+// =========================================================
+// ЧАСТЬ 1: CUSTOM HOOK (Логика фильтрации)
+// =========================================================
+const useProductFilters = (items) => {
+  const [category, setCategory] = useState("");
+  const [minPrice, setMinPrice] = useState("");
+  const [maxPrice, setMaxPrice] = useState("");
+  const [onlyInStock, setOnlyInStock] = useState(false);
+
+  const filteredItems = useMemo(() => {
+    return items.filter(item => {
+      const matchCategory = category ? item.category === category : true;
+      const matchMinPrice = minPrice ? item.price >= Number(minPrice) : true;
+      const matchMaxPrice = maxPrice ? item.price <= Number(maxPrice) : true;
+      const matchStock = onlyInStock ? item.stock > 0 : true;
+      return matchCategory && matchMinPrice && matchMaxPrice && matchStock;
+    });
+  }, [items, category, minPrice, maxPrice, onlyInStock]);
+
+  const resetFilters = () => {
+    setCategory("");
+    setMinPrice("");
+    setMaxPrice("");
+    setOnlyInStock(false);
+  };
+
+  return {
+    filters: { category, minPrice, maxPrice, onlyInStock },
+    setCategory, setMinPrice, setMaxPrice, setOnlyInStock,
+    filteredItems, resetFilters
+  };
+};
+
+// =========================================================
+// ЧАСТЬ 2: ОСНОВНОЙ КОМПОНЕНТ
+// =========================================================
 const Products = () => {
   const [services, setServices] = useState([
     { id: 1, name: "Hair Styling", category: "Hair", price: 6000, stock: 5 },
@@ -10,35 +46,53 @@ const Products = () => {
     { id: 5, name: "Eyebrow", category: "Face", price: 5000, stock: 2 },
   ]);
 
-  
   const [searchTerm, setSearchTerm] = useState("");
   const [formData, setFormData] = useState({ name: "", category: "", price: "", stock: "" });
   const [editingId, setEditingId] = useState(null);
   const [isDelOpen, setIsDelOpen] = useState(false);
   const [toDelete, setToDelete] = useState(null);
-
-  
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 3;
 
-  
-  const filtered = services.filter(s => s.name.toLowerCase().includes(searchTerm.toLowerCase()));
+  // 2. ПОДКЛЮЧАЕМ НАШ ХУК
+  const { 
+    filters, setCategory, setMinPrice, setMaxPrice, setOnlyInStock, 
+    filteredItems, resetFilters 
+  } = useProductFilters(services);
+
+  // 3. ФИЛЬТРУЕМ ПО ИМЕНИ ПОВЕРХ РЕЗУЛЬТАТОВ ХУКА
+  const filtered = filteredItems.filter(s => 
+    s.name.toLowerCase().includes(searchTerm.toLowerCase())
+  );
+
   const lastIdx = currentPage * itemsPerPage;
   const firstIdx = lastIdx - itemsPerPage;
   const currentItems = filtered.slice(firstIdx, lastIdx);
 
-  
   const handleSave = (e) => {
     e.preventDefault();
+    
+    // Создаем объект с правильными типами данных (числа вместо строк)
+    const processedData = {
+      ...formData,
+      price: Number(formData.price) || 0, // Если пусто, будет 0
+      stock: Number(formData.stock) || 0  // Если пусто, будет 0
+    };
+
     if (editingId) {
-      setServices(services.map(s => s.id === editingId ? { ...formData, id: s.id } : s));
+      setServices(services.map(s => 
+        s.id === editingId ? { ...processedData, id: s.id } : s
+      ));
       setEditingId(null);
     } else {
-      setServices([...services, { ...formData, id: Date.now() }]);
+      // При добавлении нового тоже следим за числами
+      setServices([...services, { ...processedData, id: Date.now() }]);
     }
+    
+    // Сбрасываем форму
     setFormData({ name: "", category: "", price: "", stock: "" });
   };
-
+  
   const confirmDelete = () => {
     setServices(services.filter(s => s.id !== toDelete.id));
     setIsDelOpen(false);
@@ -48,7 +102,7 @@ const Products = () => {
     <div style={{ padding: '20px', background: 'white', borderRadius: '15px' }}>
       <h2 style={{ color: '#ff4d94' }}>Service Management</h2>
 
-      
+      {/* Форма добавления */}
       <form onSubmit={handleSave} style={formBox}>
         <div style={inputGrid}>
           <input placeholder="Service Name" value={formData.name} onChange={e => setFormData({...formData, name: e.target.value})} required style={inStyle}/>
@@ -59,25 +113,45 @@ const Products = () => {
         <button type="submit" style={btnMain}>{editingId ? "Update" : "Add Service"}</button>
       </form>
 
-      
-      <div style={{ margin: '20px 0', display: 'flex', gap: '10px' }}>
-        <input placeholder="Search..." onChange={e => setSearchTerm(e.target.value)} style={searchIn}/>
+      {/* 4. НОВЫЙ БЛОК: Продвинутые фильтры (категории, цена, сток) */}
+      <div style={filterPanel}>
+        <select value={filters.category} onChange={e => setCategory(e.target.value)} style={inStyle}>
+          <option value="">All Categories</option>
+          <option value="Hair">Hair</option>
+          <option value="Nails">Nails</option>
+          <option value="Face">Face</option>
+        </select>
+
+        <input placeholder="Min Price" type="number" value={filters.minPrice} onChange={e => setMinPrice(e.target.value)} style={{...inStyle, width: '100px'}}/>
+        <input placeholder="Max Price" type="number" value={filters.maxPrice} onChange={e => setMaxPrice(e.target.value)} style={{...inStyle, width: '100px'}}/>
+
+        <label style={{ display: 'flex', alignItems: 'center', fontSize: '13px', gap: '5px', color: '#ff4d94' }}>
+          <input type="checkbox" checked={filters.onlyInStock} onChange={e => setOnlyInStock(e.target.checked)} />
+          In Stock Only
+        </label>
+
+        <button onClick={resetFilters} style={{...btnSec, padding: '5px 15px'}}>Reset Filters</button>
+      </div>
+
+      {/* Поиск и сортировка */}
+      <div style={{ margin: '10px 0 20px 0', display: 'flex', gap: '10px' }}>
+        <input placeholder="Search by name..." value={searchTerm} onChange={e => setSearchTerm(e.target.value)} style={searchIn}/>
         <button onClick={() => setServices([...services].sort((a,b) => a.price - b.price))} style={btnSec}>Sort by Price</button>
       </div>
 
-      
       <table style={{ width: '100%', borderCollapse: 'collapse' }}>
         <thead>
           <tr style={{ borderBottom: '2px solid #fff0f6', color: '#ff4d94', textAlign: 'left' }}>
-            <th>Service</th><th>Price</th><th>Stock</th><th>Actions</th>
+            <th>Service</th><th>Category</th><th>Price</th><th>Stock</th><th>Actions</th>
           </tr>
         </thead>
         <tbody>
           {currentItems.map(s => (
             <tr key={s.id} style={{ borderBottom: '1px solid #f9f9f9' }}>
-              <td style={{ padding: '12px 0' }}>{s.name}</td>
+              <td style={{ padding: '12px 0', fontWeight: 'bold' }}>{s.name}</td>
+              <td>{s.category}</td>
               <td>{s.price} ₸</td>
-              <td>{s.stock}</td>
+              <td style={{ color: s.stock === 0 ? 'red' : 'inherit' }}>{s.stock === 0 ? "Out of Stock" : s.stock}</td>
               <td>
                 <button onClick={() => {setEditingId(s.id); setFormData(s)}} style={actBtn}>Edit</button>
                 <button onClick={() => {setToDelete(s); setIsDelOpen(true)}} style={{...actBtn, color: 'red'}}>Delete</button>
@@ -87,14 +161,13 @@ const Products = () => {
         </tbody>
       </table>
 
-      
+      {/* Пагинация */}
       <div style={{ marginTop: '15px', display: 'flex', gap: '5px' }}>
         {Array.from({ length: Math.ceil(filtered.length / itemsPerPage) }, (_, i) => (
           <button key={i} onClick={() => setCurrentPage(i+1)} style={{...pageBtn, background: currentPage === i+1 ? '#ff4d94' : 'white', color: currentPage === i+1 ? 'white' : 'black'}}>{i+1}</button>
         ))}
       </div>
 
-      
       <Modal isOpen={isDelOpen} onClose={() => setIsDelOpen(false)} title="Confirm Delete">
         <p>Delete <strong>{toDelete?.name}</strong>?</p>
         <button onClick={confirmDelete} style={{...btnMain, background: 'red'}}>Confirm</button>
@@ -103,13 +176,14 @@ const Products = () => {
   );
 };
 
-
+// Стили
+const filterPanel = { display: 'flex', gap: '10px', flexWrap: 'wrap', marginBottom: '10px', padding: '15px', background: '#fffafb', borderRadius: '10px', alignItems: 'center' };
 const formBox = { background: '#fffafb', padding: '15px', borderRadius: '10px', marginBottom: '20px' };
 const inputGrid = { display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '10px' };
-const inStyle = { padding: '8px', borderRadius: '5px', border: '1px solid #eee' };
+const inStyle = { padding: '8px', borderRadius: '5px', border: '1px solid #eee', fontSize: '13px' };
 const btnMain = { background: '#ff4d94', color: 'white', border: 'none', padding: '10px 15px', borderRadius: '5px', cursor: 'pointer', marginTop: '10px' };
 const searchIn = { padding: '8px', borderRadius: '5px', border: '1px solid #eee', width: '200px' };
-const btnSec = { background: 'white', border: '1px solid #ff4d94', color: '#ff4d94', borderRadius: '5px', padding: '0 10px', cursor: 'pointer' };
+const btnSec = { background: 'white', border: '1px solid #ff4d94', color: '#ff4d94', borderRadius: '5px', padding: '0 10px', cursor: 'pointer', fontSize: '13px' };
 const actBtn = { background: 'none', border: 'none', cursor: 'pointer', color: '#3498db', marginRight: '10px' };
 const pageBtn = { padding: '5px 10px', border: '1px solid #eee', borderRadius: '5px', cursor: 'pointer' };
 
